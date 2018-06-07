@@ -23,7 +23,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import eu.pretix.libpretixprint.helpers.BarcodeQR;
@@ -33,16 +35,16 @@ import static com.itextpdf.text.Utilities.millimetersToPoints;
 public class Layout {
     private JSONArray elements;
     private InputStream backgroundInputStream;
-    private ContentProvider contentProvider;
+    private Iterator<ContentProvider> contentProviders;
 
-    public Layout(JSONArray elements, String background, ContentProvider contentProvider) throws FileNotFoundException {
+    public Layout(JSONArray elements, String background, Iterator<ContentProvider> contentProvider) throws FileNotFoundException {
         this(elements, new FileInputStream(background), contentProvider);
     }
 
-    public Layout(JSONArray elements, InputStream background, ContentProvider contentProvider) {
+    public Layout(JSONArray elements, InputStream background, Iterator<ContentProvider> contentProviders) {
         this.elements = elements;
         this.backgroundInputStream = background;
-        this.contentProvider = contentProvider;
+        this.contentProviders = contentProviders;
     }
 
     private void drawQrCode(JSONObject data, String text, PdfContentByte cb) throws IOException, DocumentException, JSONException {
@@ -130,7 +132,12 @@ public class Layout {
         ct.go();
     }
 
-    public void render(String outputFilename)
+    public void render(String filename)
+            throws Exception {
+        render(new FileOutputStream(filename));
+    }
+
+    public void render(OutputStream os)
             throws Exception {
         PdfReader reader = new PdfReader(backgroundInputStream);
         if (reader.getNumberOfPages() < 1) {
@@ -138,20 +145,26 @@ public class Layout {
         }
 
         Document document = new Document(reader.getPageSize(1));
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outputFilename));
+        PdfWriter writer = PdfWriter.getInstance(document, os);
         document.open();
 
         PdfContentByte cb = writer.getDirectContent();
 
-        // Copy background
-        cb.addTemplate(writer.getImportedPage(reader, 1), 0, 0);
+        while(contentProviders.hasNext()) {
+            ContentProvider cp = contentProviders.next();
 
-        for (int i = 0; i < elements.length(); i++) {
-            JSONObject obj = elements.getJSONObject(i);
-            if (obj.getString("type").equals("barcodearea")) {
-                drawQrCode(obj, contentProvider.getBarcodeContent(obj.optString("content")), cb);
-            } else if (obj.getString("type").equals("textarea")) {
-                drawTextarea(obj, contentProvider.getTextContent(obj.getString("content"), obj.getString("text")), cb);
+            cb.addTemplate(writer.getImportedPage(reader, 1), 0, 0);
+
+            for (int i = 0; i < elements.length(); i++) {
+                JSONObject obj = elements.getJSONObject(i);
+                if (obj.getString("type").equals("barcodearea")) {
+                    drawQrCode(obj, cp.getBarcodeContent(obj.optString("content")), cb);
+                } else if (obj.getString("type").equals("textarea")) {
+                    drawTextarea(obj, cp.getTextContent(obj.getString("content"), obj.getString("text")), cb);
+                }
+            }
+            if (contentProviders.hasNext()) {
+                document.newPage();
             }
         }
         document.close();
