@@ -18,8 +18,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,12 +32,16 @@ import static com.itextpdf.text.Utilities.millimetersToPoints;
 
 public class Layout {
     private JSONArray elements;
-    private String background;
+    private InputStream backgroundInputStream;
     private ContentProvider contentProvider;
 
-    public Layout(JSONArray elements, String background, ContentProvider contentProvider) {
+    public Layout(JSONArray elements, String background, ContentProvider contentProvider) throws FileNotFoundException {
+        this(elements, new FileInputStream(background), contentProvider);
+    }
+
+    public Layout(JSONArray elements, InputStream background, ContentProvider contentProvider) {
         this.elements = elements;
-        this.background = background;
+        this.backgroundInputStream = background;
         this.contentProvider = contentProvider;
     }
 
@@ -123,15 +130,15 @@ public class Layout {
         ct.go();
     }
 
-    public void render(String ouputFilename)
+    public void render(String outputFilename)
             throws Exception {
-        PdfReader reader = new PdfReader(background);
+        PdfReader reader = new PdfReader(backgroundInputStream);
         if (reader.getNumberOfPages() < 1) {
             throw new Exception("Background PDF does not have a first page.");
         }
 
         Document document = new Document(reader.getPageSize(1));
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ouputFilename));
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outputFilename));
         document.open();
 
         PdfContentByte cb = writer.getDirectContent();
@@ -150,3 +157,4 @@ public class Layout {
         document.close();
     }
 }
+
