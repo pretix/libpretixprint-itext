@@ -5,8 +5,11 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.codec.CCITTG4Encoder;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.ExceptionConverter;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.codec.CCITTG4Encoder;
 
 import java.util.Map;
 

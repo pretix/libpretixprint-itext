@@ -2,9 +2,18 @@ package eu.pretix.libpretixprint.templating;
 
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.*;
-import eu.pretix.libpretixprint.helpers.BarcodeQR;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,7 +23,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.lowagie.text.Utilities.millimetersToPoints;
+import eu.pretix.libpretixprint.helpers.BarcodeQR;
+
+import static com.itextpdf.text.Utilities.millimetersToPoints;
 
 public class Layout {
     private JSONArray elements;

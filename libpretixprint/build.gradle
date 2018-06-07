@@ -2,7 +2,6 @@ group 'eu.pretix.pretixdesk'
 version '1.0'
 
 apply plugin: 'java-library'
-apply plugin: 'net.ltgt.apt-idea'
 apply plugin: 'jacoco'
 
 sourceCompatibility = 1.7
@@ -17,7 +16,6 @@ buildscript {
         }
     }
     dependencies {
-        classpath "net.ltgt.gradle:gradle-apt-plugin:0.13"
     }
 }
 
@@ -36,7 +34,7 @@ jacocoTestReport {
 check.dependsOn jacocoTestReport
 
 dependencies {
-    compile 'com.github.librepdf:openpdf:1.0.5'
+    compile 'com.itextpdf:itextg:5.5.10'
     compile 'com.google.zxing:core:3.3.2'
 
     // Use older org.json version to have an environment equivalent to the android platform

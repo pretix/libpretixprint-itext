@@ -1,14 +1,18 @@
-libpretixprint
-==============
+libpretixprint-itext
+====================
 
-.. image:: https://travis-ci.org/pretix/libpretixprint.svg?branch=master
-   :target: https://travis-ci.org/pretix/libpretixprint
+.. image:: https://travis-ci.org/pretix/libpretixprint-itext.svg?branch=master
+   :target: https://travis-ci.org/pretix/libpretixprint-itext
 
-.. image:: https://codecov.io/gh/pretix/libpretixprint/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/pretix/libpretixprint
+.. image:: https://codecov.io/gh/pretix/libpretixprint-itext/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/pretix/libpretixprint-itext
 
 This is a shared library between `pretixdroid`_ and `pretixdesk`_. It handles all business logic
 related to generating and printing PDF files.
+
+This is the version using *iTextG*. It is therefore licensed under the AGPL. There is an 
+Apache license version [here](https://github.com/pretix/libpretixprint), but that one doesn't
+run on Android.
 
 Release cycle
 -------------
@@ -29,7 +33,7 @@ in place that applies to all project contributions, including issues, pull reque
 
 License
 -------
-The code in this repository is published under the terms of the Apache License. 
+The code in this repository is published under the terms of the AGPL. 
 See the LICENSE file for the complete license text.
 
 This project is maintained by Raphael Michel <mail@raphaelmichel.de>. See the

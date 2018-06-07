@@ -1,7 +1,7 @@
 package eu.pretix.libpretixprint.templating;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.BaseFont;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.BaseFont;
 
 import java.io.IOException;
 import java.util.HashMap;
