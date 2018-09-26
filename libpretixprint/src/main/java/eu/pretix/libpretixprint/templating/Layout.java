@@ -15,6 +15,7 @@ import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.codec.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import eu.pretix.libpretixprint.helpers.BarcodeQR;
+import eu.pretix.libpretixprint.helpers.EmbeddedLogos;
 
 import static com.itextpdf.text.Utilities.millimetersToPoints;
 
@@ -49,6 +51,23 @@ public class Layout {
         this.contentProviders = contentProviders;
     }
 
+    private void drawPoweredBy(JSONObject data, String style, PdfContentByte cb) throws IOException, DocumentException, JSONException {
+        String b64data = "";
+        if (style.equals("white")) {
+            b64data = EmbeddedLogos.POWERED_BY_PRETIX_WHITE;
+        } else {
+            b64data = EmbeddedLogos.POWERED_BY_PRETIX_DARK;
+        }
+        Image img = Image.getInstance(Base64.decode(b64data));
+        float size = millimetersToPoints((float) data.getDouble("size"));
+        img.scalePercent(size * 100f / img.getPlainHeight());
+        cb.addImage(
+                img, img.getScaledWidth(), 0, 0, img.getScaledHeight(),
+                millimetersToPoints((float) data.getDouble("left")),
+                millimetersToPoints((float) data.getDouble("bottom"))
+        );
+    }
+
     private void drawQrCode(JSONObject data, String text, PdfContentByte cb) throws IOException, DocumentException, JSONException {
         Map<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
@@ -59,10 +78,11 @@ public class Layout {
                 hints
         );
 
+        float size = millimetersToPoints((float) data.getDouble("size"));
         Image img = bqr.getImage();
-        img.scaleAbsoluteHeight(millimetersToPoints((float) data.getDouble("size")));
+        img.scaleToFit(size, size);
         cb.addImage(
-                img, img.getWidth(), 0, 0, img.getHeight(),
+                img, img.getScaledWidth(), 0, 0, img.getScaledHeight(),
                 millimetersToPoints((float) data.getDouble("left")),
                 millimetersToPoints((float) data.getDouble("bottom"))
         );
@@ -174,6 +194,8 @@ public class Layout {
                     drawQrCode(obj, cp.getBarcodeContent(obj.optString("content")), cb);
                 } else if (obj.getString("type").equals("textarea")) {
                     drawTextarea(obj, cp.getTextContent(obj.getString("content"), obj.getString("text")), cb);
+                } else if (obj.getString("type").equals("poweredby")) {
+                    drawPoweredBy(obj, obj.getString("content"), cb);
                 }
             }
             if (contentProviders.hasNext()) {
