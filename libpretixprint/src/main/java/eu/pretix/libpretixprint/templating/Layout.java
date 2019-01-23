@@ -33,6 +33,7 @@ import java.util.Map;
 
 import eu.pretix.libpretixprint.helpers.BarcodeQR;
 import eu.pretix.libpretixprint.helpers.EmbeddedLogos;
+import sun.rmi.runtime.Log;
 
 import static com.itextpdf.text.Utilities.millimetersToPoints;
 
@@ -102,6 +103,10 @@ public class Layout {
 
         FontRegistry fontRegistry = FontRegistry.getInstance();
         BaseFont baseFont = fontRegistry.get(data.getString("fontfamily"), style);
+        if (baseFont == null) {
+            System.out.print("Unable to load font " + data.getString("fontfamily"));
+            baseFont = fontRegistry.get("Open Sans", style);
+        }
         Font font = new Font(baseFont, fontsize);
 
         font.setColor(
