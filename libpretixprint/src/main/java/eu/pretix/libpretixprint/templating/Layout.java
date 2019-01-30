@@ -33,7 +33,6 @@ import java.util.Map;
 
 import eu.pretix.libpretixprint.helpers.BarcodeQR;
 import eu.pretix.libpretixprint.helpers.EmbeddedLogos;
-import sun.rmi.runtime.Log;
 
 import static com.itextpdf.text.Utilities.millimetersToPoints;
 
