@@ -7,9 +7,9 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.RectangleReadOnly;
+import com.itextpdf.text.io.StreamUtil;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
@@ -49,6 +49,23 @@ public class Layout {
         this.elements = elements;
         this.backgroundInputStream = background;
         this.contentProviders = contentProviders;
+    }
+
+    private void drawImage(JSONObject data, InputStream istream, PdfContentByte cb) throws IOException, DocumentException, JSONException {
+        if (istream == null) return;
+        Image img = Image.getInstance(StreamUtil.inputStreamToArray(istream));
+        float width = millimetersToPoints((float) data.getDouble("width"));
+        float height = millimetersToPoints((float) data.getDouble("height"));
+        img.scaleToFit(width, height);
+        float x = millimetersToPoints((float) data.getDouble("left"));
+        float y = millimetersToPoints((float) data.getDouble("bottom"));
+        if (img.getScaledWidth() < width) {
+            x += (width - img.getScaledWidth()) / 2.0;
+        }
+        if (img.getScaledHeight() < height) {
+            y += (height - img.getScaledHeight()) / 2.0;
+        }
+        cb.addImage(img, img.getScaledWidth(), 0, 0, img.getScaledHeight(), x, y);
     }
 
     private void drawPoweredBy(JSONObject data, String style, PdfContentByte cb) throws IOException, DocumentException, JSONException {
@@ -221,6 +238,8 @@ public class Layout {
                     drawQrCode(obj, cp.getBarcodeContent(obj.optString("content")), cb);
                 } else if (obj.getString("type").equals("textarea")) {
                     drawTextarea(obj, cp.getTextContent(obj.getString("content"), obj.getString("text")), cb);
+                } else if (obj.getString("type").equals("imagearea")) {
+                    drawImage(obj, cp.getImageContent(obj.getString("content")), cb);
                 } else if (obj.getString("type").equals("poweredby")) {
                     drawPoweredBy(obj, obj.getString("content"), cb);
                 }
